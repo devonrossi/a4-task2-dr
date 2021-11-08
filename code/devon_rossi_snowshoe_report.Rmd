@@ -32,12 +32,12 @@ bonanza_hares <- read_csv(here("data", "bonanza_hares.csv"))
 #### A. Annual juvenile hare trap counts
 Count the total number of juvenile hare trappings during each year of the study, and create a finalized data visualization of the counts by year. Include a figure caption below the figure in your report. 
 
-##### Data Wrangling
+##### Data Wrangling and Summary Stats
 ```{r}
 juvenile_hares <- bonanza_hares %>% 
   filter(age == "j") %>% #filter for juvenile hares
-  mutate(date_new = mdy(date)) %>% 
-  mutate(year = year(date_new)) %>% 
+  mutate(date_new = mdy(date)) %>% #new column for date
+  mutate(year = year(date_new)) %>% #new column for year
   group_by(year) #group by year
 
 #Hare count and summary statistics 
@@ -48,7 +48,7 @@ juvenile_hares_count <- juvenile_hares %>%
             sd_count = sd(hare_count, na.rm = TRUE))
 #find mean, median, and sd for juvenile hare count
 
-juvenile_hares_count
+juvenile_hares_count #call on summary stat table
 # Mean = 31.5
 #Median = 18.5
 #SD = 35.88492	
@@ -58,30 +58,42 @@ juvenile_hares_count
 #### Data Visualization
 ```{r}
 ggplot(data = juvenile_hares, aes(x = year)) +
-  geom_histogram(bins = 12, color = "palevioletred4", fill = "palevioletred3") +
-  theme_minimal() +
+  geom_histogram(bins = 12, color = "springgreen4", fill = "springgreen3") +
+  theme_light() +
+  scale_x_continuous(breaks = 1999:2012) +
   labs(title = "Annual Juvenile Hare Trap Counts",
        x = "Year",
-       y = "Trap Counts")
+       y = "Trap Counts",
+       caption = "Table 1: Juvenile hare trap counts from 1999 - 2012")
 ```
 
 What were the minimum and maximum counts of juvenile hare trappings?
-Mean or median annual number of juvenile hares trapped?
-General/notable trends?
-These are absolute counts, but this count is also impacted by effort (e.g. the number of days and number of traps in the study each year). What would you suggest be done moving forward (you are not expected to actually do this) to standardize the juvenile hare population in future analyses?
 
+Mean or median annual number of juvenile hares trapped?
+
+General/notable trends?
+
+These are absolute counts, but this count is also impacted by effort (e.g. the number of days and number of traps in the study each year). What would you suggest be done moving forward (you are not expected to actually do this) to standardize the juvenile hare population in future analyses?
 
 
 
 #### B. Visualize juvenile hare weights
 Create a finalized data visualization (or visualizations) in which you compare **juvenile hare weights by sex and site (grid)** (ignore other variables). You should include groups where these variables are not recorded (`NA`). Include finalized figure captions below your visualization(s).
+
+#### Data Visualization
 ```{r}
+juvenile_hare_weights <- juvenile_hares %>% 
+  select(weight, sex, grid)
 
-
-
-
-
-
+ggplot(data = juvenile_hare_weights, aes(x = sex, y = weight)) +
+  geom_jitter(aes(color = sex)) +
+  geom_boxplot() +
+  theme_light() +
+  facet_wrap(~ grid)
+  labs(Title = "Juvenile Hare Weights by Sex and Site",
+       x = "Sex",
+       y = "Site",
+       Caption = "Table 2: Juvenile hare weight comparison by sex and site")
 
 ```
 Then, in 2 - 3 sentences below your visualization(s) describe in text the main takeaways that you would want the audience to understand from your figures.
