@@ -32,7 +32,7 @@ bonanza_hares <- read_csv(here("data", "bonanza_hares.csv"))
 #### A. Annual juvenile hare trap counts
 Count the total number of juvenile hare trappings during each year of the study, and create a finalized data visualization of the counts by year. Include a figure caption below the figure in your report. 
 
-##### Data Wrangling and Summary Stats
+##### Data Wrangling
 ```{r}
 juvenile_hares <- bonanza_hares %>% 
   filter(age == "j") %>% #filter for juvenile hares
@@ -40,7 +40,11 @@ juvenile_hares <- bonanza_hares %>%
   mutate(year = year(date_new)) %>% #new column for year
   group_by(year) #group by year
 
-#Hare count and summary statistics 
+```
+
+#### Summary Stats
+```{r}
+#Hare count and summary statistics (mean, median, SD)
 juvenile_hares_count <- juvenile_hares %>% 
   summarize(hare_count = n()) %>% #count total # of juvenile hare trappings
   summarize(mean_count = mean(hare_count, na.rm = TRUE), 
@@ -52,13 +56,12 @@ juvenile_hares_count #call on summary stat table
 # Mean = 31.5
 #Median = 18.5
 #SD = 35.88492	
-  
 ```
 
 #### Data Visualization
 ```{r}
 ggplot(data = juvenile_hares, aes(x = year)) +
-  geom_histogram(bins = 12, color = "springgreen4", fill = "springgreen3") +
+  geom_bar(bins = 15, color = "springgreen4", fill = "springgreen3") +
   theme_light() +
   scale_x_continuous(breaks = 1999:2012) +
   labs(title = "Annual Juvenile Hare Trap Counts",
@@ -73,7 +76,9 @@ Mean or median annual number of juvenile hares trapped?
 
 General/notable trends?
 
-These are absolute counts, but this count is also impacted by effort (e.g. the number of days and number of traps in the study each year). What would you suggest be done moving forward (you are not expected to actually do this) to standardize the juvenile hare population in future analyses?
+These are absolute counts, but this count is also impacted by effort (e.g. the number of days and number of traps in the study each year).
+
+What would you suggest be done moving forward (you are not expected to actually do this) to standardize the juvenile hare population in future analyses?
 
 
 
@@ -87,17 +92,17 @@ juvenile_hare_weights <- juvenile_hares %>%
 
 ggplot(data = juvenile_hare_weights, aes(x = sex, y = weight)) +
   geom_jitter(aes(color = sex)) +
-  geom_boxplot() +
+  geom_boxplot(fill = NA) +
+  scale_color_manual(values = c("darkorchid4", "darkorange1", "slateblue4")) +
   theme_light() +
-  facet_wrap(~ grid)
-  labs(Title = "Juvenile Hare Weights by Sex and Site",
+  facet_wrap(~ grid) + #remember to connect code lines with plus
+  labs(title = "Juvenile Hare Weights by Sex and Site",
        x = "Sex",
        y = "Site",
-       Caption = "Table 2: Juvenile hare weight comparison by sex and site")
+       caption = "Table 2: Juvenile hare weight comparison by sex and site")
 
 ```
 Then, in 2 - 3 sentences below your visualization(s) describe in text the main takeaways that you would want the audience to understand from your figures.
-
 
 
 
@@ -106,15 +111,28 @@ Further compare mean weights for **juvenile male and female snowshoe hares** inc
 
 A finalized table containing the mean, standard deviation, and sample size for male and female juvenile snowshoe hares, with a table caption (remember, a table caption should be placed *above* the table in your report)
 
+#### Summary Statistics
+```{r}
+juvenile_hare_weight_comparison <- juvenile_hares %>% 
+  select(sex, weight) %>% #select sex & weight
+  group_by(sex) %>% 
+  drop_na(weight) #get rid of NA weight values
+
+juvenile_hare_summary <- juvenile_hare_weight_comparison %>% 
+  summarize(mean_weight = mean(weight, na.rm = TRUE),
+        median_weight = median(weight, na.rm = TRUE),
+        sd_weight = sd(weight, na.rm = TRUE),
+        n = n()) #how many are there
+
+juvenile_hare_summary #call on mean/median/sd weight table
+                                              
+```
+
+
 ```{r}
 
-
-
-
-
-
-
 ```
+
 A 2 - 3 sentence comprehensive statement of the means comparison, including at least:
 The actual difference in means
 Effect size (Cohen's *d*) (see effsize::cohen.d() example in the Lab 5 key)
