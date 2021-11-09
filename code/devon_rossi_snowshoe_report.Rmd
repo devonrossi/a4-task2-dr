@@ -14,6 +14,8 @@ library(lubridate)
 library(kableExtra)
 library(dplyr)
 library(broom)
+library(ggplot2)
+library(effsize)
 #Attach packages
 ```
 
@@ -62,7 +64,7 @@ juvenile_hares_count %>% #create table for summary stats for # of traps
 ```{r}
 ggplot(data = juvenile_hares, aes(x = year)) +
   geom_bar(bins = 5, color = "steelblue4", fill = "steelblue3") +
-  theme_update() +
+  theme_light() +
   scale_x_continuous(breaks = 1999:2012) +
   scale_y_continuous() +
   labs(title = "Annual Juvenile Hare Trap Counts",
@@ -71,7 +73,8 @@ ggplot(data = juvenile_hares, aes(x = year)) +
        caption = "Table 1: Juvenile hare trap counts from 1999 - 2012") +
   theme(plot.title = element_text(hjust = 0.5)) +
   theme(plot.title = element_text(face = "bold", size = 12)) +
-  theme(axis.title = element_text(face = "bold", size = 10))
+  theme(axis.title = element_text(face = "bold", size = 10)) +
+  theme(plot.background = element_rect(fill = "azure2"))
 ```
 
 What were the minimum and maximum counts of juvenile hare trappings?
@@ -108,7 +111,7 @@ juvenile_hare_weights <- juvenile_hares %>%
 ggplot(data = juvenile_hare_weights, aes(x = sex, y = weight)) +
   geom_jitter(aes(color = sex, color = NA), size = 2) +
   geom_boxplot(fill = NA) +
-  scale_color_manual(values = c("darkorchid4", "darkorange1", "lavenderblush")) +
+  scale_color_manual(values = c("darkorchid4", "darkorange1")) +
   theme_light() +
   theme(legend.position = "none") +
   facet_wrap(~ grid) + #remember to connect ggplot to labs with '+'
@@ -117,8 +120,9 @@ ggplot(data = juvenile_hare_weights, aes(x = sex, y = weight)) +
        y = "Site",
        caption = "Table 2: Juvenile hare weight comparison by sex and site") +
   theme(plot.title = element_text(hjust = 0.5)) +
-  theme(plot.title = element_text(face = "bold", size = 12)) +
-  theme(axis.title = element_text(face = "bold", size = 10))
+  theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = 12)) +
+  theme(axis.title = element_text(face = "bold", size = 10)) +
+  theme(plot.background = element_rect(fill = "white"))
 
 ```
 Then, in 2 - 3 sentences below your visualization(s) describe in text the main takeaways that you would want the audience to understand from your figures.
@@ -178,7 +182,8 @@ male_hare_weight <- juvenile_hare_weight_comparison %>% #male weight vector
   drop_na(weight) %>% #drop na weights
   pull(weight)
 
-hare_t <- t.test(female_hare_weight, male_hare_weight)
+hare_t <- t.test(female_hare_weight, male_hare_weight) 
+#Error in t.test.default(female_hare_weight, male_hare_weight) : not enough 'x' observations???
 ```
 
 #### Cohen's d Effect Size
@@ -186,9 +191,10 @@ hare_t <- t.test(female_hare_weight, male_hare_weight)
 hare_cohen <- cohen.d(female_hare_weight, male_hare_weight)
 ```
 A 2 - 3 sentence comprehensive statement of the means comparison, including at least:
-The actual difference in means
-Effect size (Cohen's *d*) (see effsize::cohen.d() example in the Lab 5 key)
-Outcome of an unpaired two-sample t-test
+
+-The actual difference in means
+-Effect size (Cohen's *d*) (see effsize::cohen.d() example in the Lab 5 key)
+-Outcome of an unpaired two-sample t-test
 
 #### D. Relationship between juvenile weight & hind foot length
 Explore the relationship between juvenile snowshoe hare hind foot length (variable `hindft`, recorded in millimeters), and weight. Include all juvenile hares in the study. Create a final visualization of juvenile hare hind foot length versus weight. Include a figure caption.
