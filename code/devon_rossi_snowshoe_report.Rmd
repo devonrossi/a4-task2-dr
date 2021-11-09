@@ -61,7 +61,7 @@ juvenile_hares_count #call on summary stat table
 #### Data Visualization
 ```{r}
 ggplot(data = juvenile_hares, aes(x = year)) +
-  geom_bar(bins = 15, color = "springgreen4", fill = "springgreen3") +
+  geom_bar(bins = 15, color = "steelblue4", fill = "steelblue3") +
   theme_light() +
   scale_x_continuous(breaks = 1999:2012) +
   labs(title = "Annual Juvenile Hare Trap Counts",
@@ -95,7 +95,7 @@ ggplot(data = juvenile_hare_weights, aes(x = sex, y = weight)) +
   geom_boxplot(fill = NA) +
   scale_color_manual(values = c("darkorchid4", "darkorange1", "slateblue4")) +
   theme_light() +
-  facet_wrap(~ grid) + #remember to connect code lines with plus
+  facet_wrap(~ grid) + #remember to connect ggplot to labs with '+'
   labs(title = "Juvenile Hare Weights by Sex and Site",
        x = "Sex",
        y = "Site",
@@ -128,9 +128,13 @@ juvenile_hare_summary #call on mean/median/sd weight table
                                               
 ```
 
+Note: Exploratory graphs (e.g. histograms, QQ-plots) to explore assumptions of your t-test should not show up in your final knitted document, but you DO still need to create and think about them to determine whether a t-test is appropriate. If you want keep the code chunk containing those exploratory visualizations in your .Rmd but not appear in the knitted doc, you can add `include = FALSE` in the code chunk header.
 
+#### Exploratory QQ-plot
 ```{r}
-
+ggplot(data = juvenile_hare_weight_comparison, aes(sample = weight)) +
+  geom_qq() +
+  facet_wrap(~sex)
 ```
 
 A 2 - 3 sentence comprehensive statement of the means comparison, including at least:
