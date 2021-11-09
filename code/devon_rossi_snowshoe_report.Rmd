@@ -16,6 +16,7 @@ library(dplyr)
 library(broom)
 library(ggplot2)
 library(effsize)
+library(equatiomatic)
 #Attach packages
 ```
 
@@ -57,7 +58,7 @@ juvenile_hares_count <- juvenile_hares %>%
 
 juvenile_hares_count %>% #create table for summary stats for # of traps
   kbl() %>% 
-  kable_styling()
+  kable_styling(full_width = FALSE, font = 12)
 ```
 
 #### Data Visualization
@@ -74,7 +75,7 @@ ggplot(data = juvenile_hares, aes(x = year)) +
   theme(plot.title = element_text(hjust = 0.5)) +
   theme(plot.title = element_text(face = "bold", size = 12)) +
   theme(axis.title = element_text(face = "bold", size = 10)) +
-  theme(plot.background = element_rect(fill = "azure2"))
+  theme(plot.background = element_rect(fill = "azure3"))
 ```
 
 What were the minimum and maximum counts of juvenile hare trappings?
@@ -91,6 +92,9 @@ These are absolute counts, but this count is also impacted by effort (e.g. the n
 
 What would you suggest be done moving forward (you are not expected to actually do this) to standardize the juvenile hare population in future analyses?
 
+```{r}
+
+```
 
 
 #### B. Visualize juvenile hare weights
@@ -100,16 +104,16 @@ Create a finalized data visualization (or visualizations) in which you compare *
 ```{r}
 juvenile_hare_weights <- juvenile_hares %>% 
   select(weight, sex, grid) %>% 
-  mutate(grid_full = case_when(
+  mutate(grid = case_when(
     grid == "bonbs" ~ "Black Spruce",
-    grid == "bobmat" ~ "Mature",
+    grid == "bonmat" ~ "Mature",
     grid == "bonrip" ~ "Riparian")) %>% 
   mutate(sex = case_when(
     sex == "f" ~ "Female",
     sex == "m" ~ "Male"))
 
 ggplot(data = juvenile_hare_weights, aes(x = sex, y = weight)) +
-  geom_jitter(aes(color = sex, color = NA), size = 2) +
+  geom_jitter(aes(color = sex), size = 2) +
   geom_boxplot(fill = NA) +
   scale_color_manual(values = c("darkorchid4", "darkorange1")) +
   theme_light() +
@@ -122,7 +126,7 @@ ggplot(data = juvenile_hare_weights, aes(x = sex, y = weight)) +
   theme(plot.title = element_text(hjust = 0.5)) +
   theme(plot.title = element_text(family = "Times New Roman", face = "bold", size = 12)) +
   theme(axis.title = element_text(face = "bold", size = 10)) +
-  theme(plot.background = element_rect(fill = "white"))
+  theme(plot.background = element_rect(fill = "lavender"))
 
 ```
 Then, in 2 - 3 sentences below your visualization(s) describe in text the main takeaways that you would want the audience to understand from your figures.
@@ -149,7 +153,7 @@ juvenile_hare_summary <- juvenile_hare_weight_comparison %>%
 
 juvenile_hare_summary %>% #create summary table for weight comparison
   kbl() %>% 
-  kable_styling()
+  kable_styling(full_width = FALSE, font = 12)
                                               
 ```
 
@@ -172,18 +176,17 @@ ggplot(data = juvenile_hare_weight_comparison, aes(sample = weight)) +
 #### T-Test
 ```{r}
 female_hare_weight <- juvenile_hare_weight_comparison %>% #female weight vector
-  filter(sex == "female") %>% 
+  filter(sex == "f") %>% 
   drop_na(weight) %>% #drop na weights
   pull(weight)
   
 
 male_hare_weight <- juvenile_hare_weight_comparison %>% #male weight vector
-  filter(sex == "male") %>% 
+  filter(sex == "m") %>% 
   drop_na(weight) %>% #drop na weights
   pull(weight)
 
 hare_t <- t.test(female_hare_weight, male_hare_weight) 
-#Error in t.test.default(female_hare_weight, male_hare_weight) : not enough 'x' observations???
 ```
 
 #### Cohen's d Effect Size
@@ -199,15 +202,16 @@ A 2 - 3 sentence comprehensive statement of the means comparison, including at l
 #### D. Relationship between juvenile weight & hind foot length
 Explore the relationship between juvenile snowshoe hare hind foot length (variable `hindft`, recorded in millimeters), and weight. Include all juvenile hares in the study. Create a final visualization of juvenile hare hind foot length versus weight. Include a figure caption.
 
-#### Exploratory Scatterplot for Linear Regression
-```{r}
+#### Scatterplot for Linear Regression
+```{r, fig.cap = "Table 3: Hind Foot Length and Weight Comparison by Sex"}
 ggplot(data = juvenile_hares, aes(x = hindft, y = weight)) +
-  geom_point() +
+  geom_point(aes(color= sex)) +
   geom_smooth(method = "lm") +
   theme_get() +
   labs(title = "Hind Foot Length and Weight",
        x = "Hind Foot (mm)",
-       y = "Weight (kg)")
+       y = "Weight (kg)",
+       caption = "Table 3: Hind Foot Length and Weight Comparison by Sex")
 
 ```
 
