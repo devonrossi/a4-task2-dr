@@ -42,9 +42,8 @@ juvenile_hares <- bonanza_hares %>%
 
 ```
 
-#### Summary Stats
+#### Summary Statistics - Mean, Median, and SD + Create Summary Table
 ```{r}
-#Hare count and summary statistics (mean, median, SD)
 juvenile_hares_count <- juvenile_hares %>% 
   summarize(hare_count = n()) %>% #count total # of juvenile hare trappings
   summarize(mean_count = mean(hare_count, na.rm = TRUE), 
@@ -52,27 +51,31 @@ juvenile_hares_count <- juvenile_hares %>%
             sd_count = sd(hare_count, na.rm = TRUE))
 #find mean, median, and sd for juvenile hare count
 
-juvenile_hares_count #call on summary stat table
-# Mean = 31.5
-#Median = 18.5
-#SD = 35.88492	
+juvenile_hares_count %>% #create table for summary stats for # of traps
+  kbl() %>% 
+  kable_styling()
 ```
 
 #### Data Visualization
 ```{r}
 ggplot(data = juvenile_hares, aes(x = year)) +
-  geom_bar(bins = 15, color = "steelblue4", fill = "steelblue3") +
+  geom_bar(bins = 5, color = "steelblue4", fill = "steelblue3") +
   theme_light() +
   scale_x_continuous(breaks = 1999:2012) +
   labs(title = "Annual Juvenile Hare Trap Counts",
        x = "Year",
        y = "Trap Counts",
-       caption = "Table 1: Juvenile hare trap counts from 1999 - 2012")
+       caption = "Table 1: Juvenile hare trap counts from 1999 - 2012") +
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 What were the minimum and maximum counts of juvenile hare trappings?
+Max = 126 traps in 1999
+Min = 2 traps in 2010
 
 Mean or median annual number of juvenile hares trapped?
+mean_count	median_count	sd_count
+31.5	       18.5	        35.88492
 
 General/notable trends?
 
@@ -91,7 +94,7 @@ juvenile_hare_weights <- juvenile_hares %>%
   select(weight, sex, grid)
 
 ggplot(data = juvenile_hare_weights, aes(x = sex, y = weight)) +
-  geom_jitter(aes(color = sex)) +
+  geom_jitter(aes(color = sex), size = 2) +
   geom_boxplot(fill = NA) +
   scale_color_manual(values = c("darkorchid4", "darkorange1", "slateblue4")) +
   theme_light() +
@@ -99,7 +102,8 @@ ggplot(data = juvenile_hare_weights, aes(x = sex, y = weight)) +
   labs(title = "Juvenile Hare Weights by Sex and Site",
        x = "Sex",
        y = "Site",
-       caption = "Table 2: Juvenile hare weight comparison by sex and site")
+       caption = "Table 2: Juvenile hare weight comparison by sex and site") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 Then, in 2 - 3 sentences below your visualization(s) describe in text the main takeaways that you would want the audience to understand from your figures.
@@ -124,11 +128,20 @@ juvenile_hare_summary <- juvenile_hare_weight_comparison %>%
         sd_weight = sd(weight, na.rm = TRUE),
         n = n()) #how many are there
 
-juvenile_hare_summary #call on mean/median/sd weight table
+juvenile_hare_summary %>% #create summary table for weight comparison
+  kbl() %>% 
+  kable_styling()
                                               
 ```
 
 Note: Exploratory graphs (e.g. histograms, QQ-plots) to explore assumptions of your t-test should not show up in your final knitted document, but you DO still need to create and think about them to determine whether a t-test is appropriate. If you want keep the code chunk containing those exploratory visualizations in your .Rmd but not appear in the knitted doc, you can add `include = FALSE` in the code chunk header.
+
+#### Exploratory Histogram
+```{r}
+ggplot(data = juvenile_hare_weight_comparison, aes(x = weight)) +
+  geom_histogram(bins = 12) +
+  facet_wrap(~sex)
+```
 
 #### Exploratory QQ-plot
 ```{r}
@@ -137,6 +150,24 @@ ggplot(data = juvenile_hare_weight_comparison, aes(sample = weight)) +
   facet_wrap(~sex)
 ```
 
+#### T-Test
+```{r}
+female_hare_weight <- juvenile_hare_weight_comparison %>% #female weight vector
+  filter (sex == "female") %>% 
+  drop_na(weight) %>% #drop na weights
+  pull(weight)
+  
+
+male_hare_weight <- juvenile_hare_weight_comparison %>% #male weight vector
+  filter (sex == "male") %>% 
+  drop_na(weight) %>% #drop na weights
+  pull(weight)
+```
+
+#### Cohen's d Effect Size
+```{r}
+
+```
 A 2 - 3 sentence comprehensive statement of the means comparison, including at least:
 The actual difference in means
 Effect size (Cohen's *d*) (see effsize::cohen.d() example in the Lab 5 key)
@@ -145,13 +176,42 @@ Outcome of an unpaired two-sample t-test
 #### D. Relationship between juvenile weight & hind foot length
 Explore the relationship between juvenile snowshoe hare hind foot length (variable `hindft`, recorded in millimeters), and weight. Include all juvenile hares in the study. Create a final visualization of juvenile hare hind foot length versus weight. Include a figure caption.
 
+#### Exploratory Scatterplot for Linear Regression
 ```{r}
+ggplot(data = juvenile_hares, aes(x = hindft, y = weight)) +
+  geom_point(size = 1.75) +
+  geom_smooth(method = "lm") +
+  scale_color_manual() +
+  scale_x_continuous() +
+  theme_get() +
+  labs(title = "Hind Foot Length and Weight",
+       x = "Hind Foot (mm)",
+       y = "Weight (kg)",
+       caption = "Table 3: Analyzing relationship between juvenile shoeshow hare hindfoot and weight")+
+  theme(plot.title = element_text(hjust = 0.5))
+       
+
+```
 
 
 
 
+#### Simple Linear Regression
+```{r}
+hare_lm <- lm(hindft ~ weight, data = juvenile_hares)
 
 
+hare_lm_tidy <- tidy(hare_lm)
+
+
+hare_lm_glance <- glance(hare_lm)
+
+
+extract_eq(model = hare_lm, use_coefs = TRUE)
+
+plot(hare_lm)
+
+cor.test(juvenile_hares$hindft, juvenile_hares$weight)
 
 ```
 In 2 - 3 sentences below your figure, describe the outcome of your linear regression exploration (e.g. slope interpretation, R2 value, and Pearson's r correlation) and touch briefly on which assumption(s) of linear regression may be a concern, and additional thoughts you have about how well (or not well…) the linear model describes the relationship. What worries you? 
